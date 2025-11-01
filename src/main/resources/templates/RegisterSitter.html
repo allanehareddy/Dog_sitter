@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register Sitter</title>
+    <link rel="icon" href="/register.png" type="image/png">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    <style>
+        footer {
+            width: 100%;
+            color: #FFD740;
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 10px 0;
+            position: absolute;
+            bottom: 0;
+            font-size: 0.9rem;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+        }
+        body, html {
+            overflow: hidden;
+            height: 100%;
+            box-sizing: border-box;
+        }
+        main {
+            overflow-y: auto;
+            max-height: calc(100vh - 120px);
+        }
+        .form-container {
+            padding-bottom: 200px;
+        }
+        .error-message {
+            color: red;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+
+        .form-control.pe-5 {
+            padding-right: 3rem;
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
+            height: calc(2.5rem + 2px);
+        }
+
+        .toggle-password {
+            background-color: transparent;
+            border: 1px solid #ced4da;
+            border-left: none;
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
+            font-size: 1rem;
+            cursor: pointer;
+            width: 3rem;
+            height: calc(2.5rem + 2px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .toggle-password:hover {
+            color: #0d6efd;
+        }
+        #successPopup {
+            z-index: 9999;
+        }
+
+        #successPopup.hidden {
+            display: none;
+        }
+
+        #successPopup .bg-white {
+            background-color: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .active {
+            background-color: #15803d;
+            color: white;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 font-sans text-gray-700">
+<header class="bg-green-600 text-white py-6 text-center">
+    <h1 class="text-3xl font-bold">Register Sitter</h1>
+    <p class="mt-2 text-lg">Register a new sitter here by filling the form</p>
+</header>
+<div class="flex h-screen">
+    <aside class="w-64 bg-gray-800 text-white p-4 space-y-4">
+        <h2 class="text-xl font-semibold text-center">Navigation</h2>
+        <ul class="space-y-2">
+            <li>
+                <a href="/home" id="homeLink" class="block px-4 py-2 rounded hover:bg-gray-700">
+                    <i class="fa-solid fa-house mr-2"></i> Home
+                </a>
+            </li>
+            <li>
+                <a href="/searchSitter" id="searchSitterLink" class="block px-4 py-2 rounded hover:bg-gray-700">
+                    <i class="fa-solid fa-magnifying-glass mr-2"></i> Search Sitter
+                </a>
+            </li>
+            <li>
+                <a href="/register" id="registerSitterLink" class="block px-4 py-2 rounded hover:bg-gray-700 active">
+                    <i class="fa-solid fa-user-plus mr-2"></i> Register Sitter
+                </a>
+            </li>
+            <li>
+                <a href="/userProfile" id="profileLink" class="block px-4 py-2 rounded hover:bg-gray-700">
+                    <i class="fa-solid fa-user mr-2"></i> Profile
+                </a>
+            </li>
+            <li>
+                <a href="/sitterList" id="sitterListLink" class="block px-4 py-2 rounded hover:bg-gray-700">
+                    <i class="fa-solid fa-list mr-2"></i> Sitter List
+                </a>
+            </li>
+        </ul>
+    </aside>
+    <main class="flex-grow p-6">
+        <div class="container mx-auto max-w-2xl bg-white rounded-lg shadow-md p-6 form-container">
+            <form id="registrationForm" enctype="multipart/form-data" class="space-y-4" novalidate>
+                <div class="mb-3">
+                    <small class="text-muted">Note<span class="text-danger">*</span> : Please enter sitter details according to form format.</small>
+                </div>
+                <div class="mb-3">
+                    <label for="contactName" class="form-label">Contact Name<span class="text-danger">*</span><small class="text-muted">  (Enter your full name)</small></label>
+                    <input type="text" class="form-control" id="contactName" name="contactName"
+                           maxlength="25" required pattern="^[a-zA-Z\s]+$"
+                           title="Name must be between 3 and 25 characters and can only contain letters and spaces." />
+                    <div class="error-message" id="contactNameError"></div>
+                </div>
+                <div class="mb-3">
+                    <label for="email" class="form-label">Email<span class="text-danger">*</span><small class="text-muted">  (We'll never share your email with anyone else)</small></label>
+                    <input type="email" class="form-control" id="email" name="email" required />
+                    <div class="error-message" id="emailError"></div>
+                </div>
+                <div class="mb-3 position-relative">
+                    <label for="password" class="form-label">Password<span class="text-danger">*</span></label>
+                    <div class="input-group">
+                        <input type="password" class="form-control pe-5" id="password" name="password" required
+                               pattern="^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,25}$" />
+                        <button type="button" class="btn btn-outline-secondary d-flex align-items-center justify-content-center toggle-password"
+                                id="togglePassword" style="z-index: 1;">
+                            <i class="fa-solid fa-eye" id="eyeIcon"></i>
+                        </button>
+                    </div>
+                    <div class="error-message" id="passwordError"></div>
+                </div>
+                <div class="mb-3">
+                    <label for="companyName" class="form-label">Company Name<span class="text-danger">*</span><small class="text-muted">  (Enter the name of your company)</small></label>
+                    <input type="text" class="form-control" id="companyName" name="companyName" required />
+                    <div class="error-message" id="companyNameError"></div>
+                </div>
+                <div class="form-group row">
+                    <label for="map-search" class="col-sm-3 col-form-label font-weight-bold">Address :</label>
+                    <div class="col-sm-9">
+                        <input type="text" name="address" class="form-control" id="map-search" placeholder="Enter your full address">
+                        <div class="error-message" id="addressError"></div>
+                    </div>
+                </div>
+
+                <div class="form-group row">
+                    <label class="col-sm-3 col-form-label font-weight-bold">Location :</label>
+                    <div class="col-sm-9">
+                        <!-- Google Map -->
+                        <div id="map-canvas" style="height: 300px; width: 100%; margin-top: 10px;"></div>
+                        <div class="row mt-3">
+                            <div class="form-group col-sm-6">
+                                <label for="lat" class="font-weight-bold col-form-label">Latitude :</label>
+                                <input type="text" name="latitude" id="lat" class="form-control latitude" placeholder="Latitude" readonly="readonly" >
+                            </div>
+                            <div class="form-group col-sm-6">
+                                <label for="lng" class="font-weight-bold col-form-label">Longitude :</label>
+                                <input type="text" name="longitude" id="lng" class="form-control longitude" placeholder="Longitude" readonly="readonly" >
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label for="timeOfOpening" class="form-label">Time of Opening<span class="text-danger">*</span><small class="text-muted">  (Enter the opening time)</small></label>
+                    <input type="time" class="form-control" id="timeOfOpening" name="timeOfOpening" required />
+                    <div class="error-message" id="timeOfOpeningError"></div>
+                </div>
+                <div class="mb-3">
+                    <label for="timeOfClosing" class="form-label">Time of Closing<span class="text-danger">*</span><small class="text-muted">  (Enter the closing time)</small></label>
+                    <input type="time" class="form-control" id="timeOfClosing" name="timeOfClosing" required />
+                    <div class="error-message" id="timeOfClosingError"></div>
+                </div>
+                <div class="mb-3">
+                    <label for="chargesPerHour" class="form-label">Charges Per Hour<span class="text-danger">*</span><small class="text-muted">  (Enter the charges per hour)</small></label>
+                    <div class="input-group">
+                        <input type="number" step="any" class="form-control" id="chargesPerHour" name="chargesPerHour" required />
+                        <span class="input-group-text">/hr</span>
+                    </div>
+                    <div class="error-message" id="chargesPerHourError"></div>
+                </div>
+                <div class="mb-3">
+                    <label for="image" class="form-label">Photo (jpg/png)<small class="text-muted">  (Upload a clear photo)</small></label>
+                    <input type="file" class="form-control" id="image" name="image" accept=".jpg,.jpeg,.png" />
+                    <div class="error-message" id="imageError"></div>
+                </div>
+
+                <input type="hidden" name="enable" value="true" />
+
+                <input type="hidden" name="role" value="USER" />
+
+                <div class="submit-button-container">
+                    <button type="submit" class="btn btn-success w-100">
+                        Register
+                    </button>
+                </div>
+                <div></div>
+            </form>
+        </div>
+    </main>
+</div>
+<div id="successPopup" class="hidden fixed top-0 left-0 w-full h-full bg-black bg-opacity-50 flex justify-center items-center">
+    <div class="bg-white p-6 rounded-lg shadow-lg text-center relative">
+        <h3 class="text-xl font-bold mb-4">Success!</h3>
+        <p class="mb-4">Sitter registered successfully.</p>
+        <button id="closePopup" class="btn btn-success px-4 py-2">Close</button>
+    </div>
+</div>
+<footer class="text-center">
+    <p>&copy; 2025 Misha Infotech</p>
+</footer>
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCFGhHTFklBNiQGjvV3h03rc_vN995emG0&libraries=places&callback=initMap"></script>
+<script>
+    let map;
+    let marker;
+    let geocoder;
+
+    function initMap() {
+        geocoder = new google.maps.Geocoder();
+
+        map = new google.maps.Map(document.getElementById('map-canvas'), {
+            center: { lat: 20.5937, lng: 78.9629 },
+            zoom: 5,
+        });
+
+        marker = new google.maps.Marker({
+            map: map,
+            draggable: true,
+        });
+
+        const autocomplete = new google.maps.places.Autocomplete(document.getElementById('map-search'));
+        autocomplete.bindTo('bounds', map);
+
+        autocomplete.addListener('place_changed', () => {
+            const place = autocomplete.getPlace();
+            if (!place.geometry) {
+                alert("No details available for this address.");
+                return;
+            }
+
+            map.setCenter(place.geometry.location);
+            map.setZoom(15);
+
+            marker.setPosition(place.geometry.location);
+
+            document.getElementById('lat').value = place.geometry.location.lat();
+            document.getElementById('lng').value = place.geometry.location.lng();
+        });
+
+        marker.addListener('dragend', (event) => {
+            geocodeLatLng(event.latLng);
+        });
+    }
+
+    function geocodeLatLng(latLng) {
+        geocoder.geocode({ location: latLng }, (results, status) => {
+            if (status === "OK") {
+                if (results[0]) {
+                    document.getElementById('map-search').value = results[0].formatted_address;
+                    document.getElementById('lat').value = latLng.lat();
+                    document.getElementById('lng').value = latLng.lng();
+                } else {
+                    alert("No results found");
+                }
+            } else {
+                alert("Geocoder failed due to: " + status);
+            }
+        });
+    }
+
+    window.onload = initMap;
+
+    const noFocusLat = document.getElementById('lat');
+    noFocusLat.addEventListener('focus', (event) => {
+        event.target.blur();
+    });
+
+    const noFocusLng = document.getElementById('lng');
+    noFocusLng.addEventListener('focus', (event) => {
+        event.target.blur();
+    });
+
+    document.addEventListener("DOMContentLoaded", () => {
+        const emailInput = document.getElementById("email");
+        const emailError = document.getElementById("emailError");
+
+        emailInput.addEventListener("blur", async () => {
+            const email = emailInput.value.trim();
+
+            emailError.textContent = "";
+
+            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailPattern.test(email)) {
+                emailError.textContent = "Invalid email format.";
+                return;
+            }
+
+            try {
+                const response = await fetch(`http://localhost:8080/sitters/emailExists?email=${encodeURIComponent(email)}`, {
+                    method: "POST",
+                });
+
+                if (!response.ok) {
+                    throw new Error("Failed to check email existence.");
+                }
+
+                const result = await response.json();
+                if (result.data === true) {
+                    emailError.textContent = "This email is already registered. Please enter a different email.";
+                }
+            } catch (error) {
+                emailError.textContent = "An error occurred while validating the email.";
+                console.error(error);
+            }
+        });
+    });
+
+    document.addEventListener("DOMContentLoaded", () => {
+
+        const form = document.getElementById("registrationForm");
+        const successPopup = document.getElementById("successPopup");
+        const closePopupButton = document.getElementById("closePopup");
+
+        form.addEventListener("submit", async (event) => {
+            event.preventDefault();
+
+            clearErrorMessages();
+
+            const isValid = validateForm();
+            if (!isValid) return;
+
+            const timeOfOpening = document.getElementById("timeOfOpening");
+            const timeOfClosing = document.getElementById("timeOfClosing");
+            if (timeOfOpening.value) {
+                timeOfOpening.value = `${timeOfOpening.value}:00`;
+            }
+            if (timeOfClosing.value) {
+                timeOfClosing.value = `${timeOfClosing.value}:00`;
+            }
+
+            const formData = new FormData(form);
+
+            try {
+                const response = await fetch("http://localhost:8080/sitters", {
+                    method: "POST",
+                    body: formData,
+                });
+
+                if (!response.ok) {
+                    throw new Error("Registration failed. Please try again.");
+                }
+
+                const responseData = await response.json();
+                console.log("API Response:", responseData);
+
+                successPopup.classList.remove("hidden");
+
+                form.reset();
+            } catch (error) {
+                alert(error.message || "An error occurred. Please try again.");
+            }
+        });
+
+        closePopupButton.addEventListener("click", () => {
+            successPopup.classList.add("hidden");
+        });
+
+        function clearErrorMessages() {
+            const errorElements = document.querySelectorAll(".error-message");
+            errorElements.forEach((element) => {
+                element.textContent = "";
+            });
+        }
+
+        function validateForm() {
+            let isValid = true;
+            let firstInvalidField = null;
+
+            const contactName = document.getElementById("contactName").value.trim();
+            const contactNameError = document.getElementById("contactNameError");
+            if (!contactName.match(/^[a-zA-Z\s]+$/) || contactName.length < 3 || contactName.length > 25) {
+                contactNameError.textContent =
+                    "Name must be between 3 and 25 characters and can only contain letters and spaces.";
+                isValid = false;
+                if (!firstInvalidField) {
+                    firstInvalidField = document.getElementById("contactName");
+                }
+            }
+
+            const email = document.getElementById("email").value.trim();
+            const emailError = document.getElementById("emailError");
+            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailPattern.test(email)) {
+                emailError.textContent = "Invalid email format.";
+                isValid = false;
+                if (!firstInvalidField) {
+                    firstInvalidField = document.getElementById("email");
+                }
+            }
+
+            const password = document.getElementById("password").value.trim();
+            const passwordError = document.getElementById("passwordError");
+            const passwordPattern = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,25}$/;
+            if (!passwordPattern.test(password)) {
+                passwordError.textContent =
+                    "Password must be 8-25 characters long and include at least one uppercase letter, one lowercase letter, one digit, and one special character.";
+                isValid = false;
+                if (!firstInvalidField) {
+                    firstInvalidField = document.getElementById("password");
+                }
+            }
+
+            const companyName = document.getElementById("companyName").value.trim();
+            const companyNameError = document.getElementById("companyNameError");
+            if (!companyName) {
+                companyNameError.textContent = "Company name is required.";
+                isValid = false;
+                if (!firstInvalidField) {
+                    firstInvalidField = document.getElementById("companyName");
+                }
+            }
+
+            const address = document.getElementById("map-search").value.trim();
+            const addressError = document.getElementById("addressError");
+            if (!address) {
+                addressError.textContent = "Address is required.";
+                isValid = false;
+                if (!firstInvalidField) {
+                    firstInvalidField = document.getElementById("map-search");
+                }
+            }
+
+            const timeOfOpening = document.getElementById("timeOfOpening").value.trim();
+            const timeOfOpeningError = document.getElementById("timeOfOpeningError");
+            if (!timeOfOpening) {
+                timeOfOpeningError.textContent = "Time of opening is required.";
+                isValid = false;
+                if (!firstInvalidField) {
+                    firstInvalidField = document.getElementById("timeOfOpening");
+                }
+            }
+
+            const timeOfClosing = document.getElementById("timeOfClosing").value.trim();
+            const timeOfClosingError = document.getElementById("timeOfClosingError");
+            if (!timeOfClosing) {
+                timeOfClosingError.textContent = "Time of closing is required.";
+                isValid = false;
+                if (!firstInvalidField) {
+                    firstInvalidField = document.getElementById("timeOfClosing");
+                }
+            }
+
+            const chargesPerHour = document.getElementById("chargesPerHour").value.trim();
+            const chargesPerHourError = document.getElementById("chargesPerHourError");
+            if (!chargesPerHour || isNaN(chargesPerHour) || parseFloat(chargesPerHour) <= 0) {
+                chargesPerHourError.textContent = "Charges per hour are required and must be a positive number.";
+                isValid = false;
+                if (!firstInvalidField) {
+                    firstInvalidField = document.getElementById("chargesPerHour");
+                }
+            }
+
+            if (firstInvalidField) {
+                firstInvalidField.focus();
+            }
+
+            return isValid;
+        }
+    });
+    document.addEventListener("DOMContentLoaded", () => {
+        const passwordInput = document.getElementById("password");
+        const togglePasswordButton = document.getElementById("togglePassword");
+        const eyeIcon = document.getElementById("eyeIcon");
+
+        togglePasswordButton.addEventListener("click", () => {
+            if (passwordInput.type === "password") {
+                passwordInput.type = "text";
+                eyeIcon.classList.remove("fa-eye");
+                eyeIcon.classList.add("fa-eye-slash");
+            } else {
+                passwordInput.type = "password";
+                eyeIcon.classList.remove("fa-eye-slash");
+                eyeIcon.classList.add("fa-eye");
+            }
+        });
+    });
+</script>
+</body>
+</html>
