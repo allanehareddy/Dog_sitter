@@ -32,8 +32,8 @@ public class SitterEntity {
 
     private String Address;
 
-    @Column(columnDefinition = "POINT")
-    private Point location;
+    private Double latitude;
+    private Double longitude;
 
     private Time timeOfOpening;
 
